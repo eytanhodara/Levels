@@ -1,1 +1,33 @@
+# Python-specific
+__pycache__/
+*.py[cod]
+*.egg
+*.egg-info
+dist
+build
+
+# Virtual environments
+venv/
+env/
+.venv/
+
+# Jupyter notebooks checkpoints
+.ipynb_checkpoints/
+
+# OS-specific
+.DS_Store
+
+# IDE-specific
+.vscode/
+.idea/
+
+# Bytecode
+*.pyo
+*.pyc
+
+# Large data or local DB
+*.db
+*.sqlite3
+
+# Environment variables
 .env
