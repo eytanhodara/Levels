@@ -16,4 +16,4 @@ def get_data(company, year, quarter, category, subfield):
     return result[0] if result else None
 
 # Example usage
-print("Revenue in Q3 2024:", get_data("Apple", "2024", "Q1","ebitda","margin"))
+print("Revenue in Q3 2024:", get_data("Apple", "2022", "Q1","revenue","value"))

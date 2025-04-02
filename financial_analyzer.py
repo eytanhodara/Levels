@@ -56,18 +56,44 @@ class FinancialAnalyzerLocal:
         init_db()
 
     def extract_quarters(self):
-        sample_text = self.engine_lvl1.query("List all quarters and years mentioned in the documents (e.g., Q4 2024). Return only unique combinations in a Python list.")
-        matches = re.findall(r'Q[1-4]\s20\d{2}', str(sample_text))
-        sorted_matches = sorted(set(matches), key=lambda x: (x.split()[1], x.split()[0]))
+        prompt = """
+        Carefully analyze the full content of all documents and extract every unique fiscal quarter and year with financial information.
+
+        Follow this process step-by-step:
+
+        1. First, identify all date mentions that indicate the end of a fiscal quarter. These often appear in phrases like:
+        - "For the quarterly period ended March 31, 2021"
+        - "Three months ended June 30, 2022"
+        - "Quarter ended September 30, 2023"
+        - "For the quarter ended December 28, 2024"
+
+        2. Extract the dates from those phrases and convert them into fiscal quarters based on these rules:
+        - January 1 to March 31 → Q1
+        - April 1 to June 30 → Q2
+        - July 1 to September 30 → Q3
+        - October 1 to December 31 → Q4
+
+        3. From each date, determine the correct year and quarter, and generate a list like:
+        ["Q1 2021", "Q2 2021", ..., "Q4 2024"]
+
+        4. Also include any quarters mentioned explicitly (e.g., "Q2 2023") even if a date isn't associated.
+
+        Return a **Python list of unique** quarter-year strings in that format, sorted by year and quarter.
+        """
+
+        response = self.engine_lvl1.query(prompt)
+        matches = re.findall(r'Q[1-4]\s20\d{2}', str(response))
+        all_quarters = sorted(set(matches), key=lambda x: (x.split()[1], x.split()[0]))
 
         grouped = defaultdict(list)
-        for match in sorted_matches:
-            q, y = match.split()
-            grouped[y].append(q)
+        for q in all_quarters:
+            quarter, year = q.split()
+            grouped[year].append(quarter)
 
         return grouped
 
-    def extract_financials(self, company: str, quarter: str):
+
+    def extract_financials(self, company: str, quarter: str):#TODO add Year
         year = quarter.split()[1]
         prompt = f"""
         Provide Apple's financial metrics for {quarter} in the following JSON format:
